@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.putin.quizapp.Model.Question;
 import com.putin.quizapp.Model.QuestionWrapper;
 import com.putin.quizapp.Model.Quiz;
+import com.putin.quizapp.Model.Response;
 import com.putin.quizapp.dao.QuestionDao;
 import com.putin.quizapp.dao.QuizDao;
 
@@ -56,4 +57,32 @@ public class QuizService {
         }
         return new ResponseEntity<>(questionsForUser,HttpStatus.OK);
     }
+
+    public ResponseEntity<Integer> calculateResult(Integer id, List<Response> responses) {
+
+    Quiz quiz = quizDao.findById(id)
+            .orElseThrow(() ->
+                    new RuntimeException("Quiz not found with id: " + id));
+
+    int right = 0;
+
+    for (Response response : responses) {
+
+        Question question = questionDao.findById(response.getId())
+                .orElseThrow(() ->
+                        new RuntimeException("Question not found with id: " + response.getId()));
+
+        // Ensure question belongs to this quiz
+        if (!quiz.getQuestions().contains(question)) {
+            throw new RuntimeException(
+                    "Question ID " + response.getId() + " does not belong to quiz " + id);
+        }
+
+        if (response.getResponse().equals(question.getRightAnswer())) {
+            right++;
+        }
+    }
+
+    return ResponseEntity.ok(right);
+}
 }
