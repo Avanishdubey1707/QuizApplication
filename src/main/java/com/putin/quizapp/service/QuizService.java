@@ -75,7 +75,7 @@ public class QuizService {
         // Ensure question belongs to this quiz
         if (!quiz.getQuestions().contains(question)) {
             throw new RuntimeException(
-                    "Question ID " + response.getId() + " does not belong to quiz " + id);
+                    "Question ID " + response.getId() + " doesn't belong to quiz " + id);
         }
 
         if (response.getResponse().equals(question.getRightAnswer())) {
